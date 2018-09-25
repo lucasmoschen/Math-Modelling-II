@@ -105,11 +105,40 @@ def draw():
     dt = (millis() - t) / 1000.0
     t = millis()
     
-#desenho de pesos e molas
-    stroke(0,200,0)
-    line(quadrado.x,quadrado.y,s1.x,s1.y)
-    stroke(0,0,200)
-    line(s1.x,s1.y,s2.x,s2.y)
+#desenho de pesos e molas        
+        
+    #stroke(0,200,0)
+    #line(quadrado.x,quadrado.y,s1.x,s1.y)
+    #stroke(0,0,200)
+    #line(s1.x,s1.y,s2.x,s2.y)
+    
+    stroke(128) #Cor cinza
+    strokeWeight(4) #Maior espessura
+    pedaco1 = r1.copy() #Vetor tamanho do pedaco
+    pedaco1.div(10) #1/10 do tamanho da mola
+    line(quadrado.x, quadrado.y, quadrado.x + pedaco1.x * 2, quadrado.y + pedaco1.y * 2) #Primeira linha
+    line(s1.x - pedaco1.x * 2, s1.y - pedaco1.y * 2, s1.x, s1.y) #Última linha
+    
+    #Inicia com x e y anteriores
+    x_anterior = quadrado.x + pedaco1.x * 2
+    y_anterior = quadrado.y + pedaco1.y * 2
+    
+    i = 0    
+    for pedaco in range(3, 8, 2):
+        lado = PVector(-pedaco1.y, pedaco1.x)
+        lado.div(lado.mag())
+        lado.mult(15)
+        line(x_anterior, y_anterior, quadrado.x + pedaco1.x * pedaco + lado.x * (-1)**i, quadrado.y + pedaco1.y * pedaco + lado.y * (-1)**i)
+        x_anterior = quadrado.x + pedaco1.x * pedaco + lado.x * (-1)**i
+        y_anterior = quadrado.y + pedaco1.y * pedaco + lado.y * (-1)**i
+        i += 1
+    
+    line(x_anterior, y_anterior, s1.x - pedaco1.x * 2, s1.y - pedaco1.y * 2)
+    
+    #line(quadrado.x + pedaco1.x * 2, quadrado.y + pedaco1.y * 2, quadrado.x + pedaco1.x * 3 - pedaco1.y, quadrado.y + pedaco1.y * 3 + pedaco1.x)
+    #line(quadrado.x + pedaco1.x * 3 - pedaco1.y, quadrado.y + pedaco1.y * 3 + pedaco1.x, quadrado.x + pedaco1.x * 5 + pedaco1.y, quadrado.y + pedaco1.y * 5 - pedaco1.x, )
+    strokeWeight(1) #Espessura normal
+    
     stroke(255)
     fill(128,128,0)
     ellipse(s1.x,s1.y,tamq,tamq)
