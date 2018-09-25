@@ -12,8 +12,8 @@ k1 = 6.0 #constante da mola superior
 k2 = 6.0 #contante da mola inferior
 c1 = 60.0 #comprimento da mola 1
 c2 = 60.0 #comprimento da mola 2
-m1 = 0.5 #massa do peso 1
-m2 = 0.5 #massa do peso 2
+m1 = 20.0 #massa do peso 1
+m2 = 5 #massa do peso 2
 k = 0.1 #constante de retardo
 
 quadrado = PVector(400.0,233.33) #posição inicial do quadrado 
@@ -31,7 +31,7 @@ v2 = PVector(0.0,0.0)
 
 def setup():
     size(800,700) 
-    frameRate(300)
+    frameRate(60)
     
 entrada = 'noMouse'
     
@@ -114,13 +114,14 @@ def draw():
     dt = (millis() - t) / 1000.0
     t = millis()
     
-#desenho de pesos e molas        
-        
-    #stroke(0,200,0)
-    #line(quadrado.x,quadrado.y,s1.x,s1.y)
-    #stroke(0,0,200)
-    #line(s1.x,s1.y,s2.x,s2.y)
+#desenho do quadrado
+    stroke(255)
+    fill(200,0,0)
+    rectMode(CENTER)
+    rect(quadrado.x,quadrado.y,tamq,tamq)
     
+#desenho de pesos e molas        
+         
     stroke(128) #Cor cinza
     strokeWeight(4) #Maior espessura
     
@@ -166,18 +167,12 @@ def draw():
     
     line(x_anterior, y_anterior, s2.x - pedaco2.x * 2, s2.y - pedaco2.y * 2)
     
-    #line(quadrado.x + pedaco1.x * 2, quadrado.y + pedaco1.y * 2, quadrado.x + pedaco1.x * 3 - pedaco1.y, quadrado.y + pedaco1.y * 3 + pedaco1.x)
-    #line(quadrado.x + pedaco1.x * 3 - pedaco1.y, quadrado.y + pedaco1.y * 3 + pedaco1.x, quadrado.x + pedaco1.x * 5 + pedaco1.y, quadrado.y + pedaco1.y * 5 - pedaco1.x, )
     strokeWeight(1) #Espessura normal
-    
     stroke(255)
     fill(128,128,0)
     ellipse(s1.x,s1.y,tamq,tamq)
     fill(0,128,128)
     ellipse(s2.x,s2.y,tamq,tamq)
-    fill(200,0,0)
-    rectMode(CENTER)
-    rect(quadrado.x,quadrado.y,tamq,tamq)
 
 #vetores posição inicial
 def r1_inicial(g,m1,m2,k1,c1):
