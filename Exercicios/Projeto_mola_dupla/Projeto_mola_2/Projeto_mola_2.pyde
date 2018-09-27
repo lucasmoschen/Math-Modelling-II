@@ -37,6 +37,9 @@ entrada = 'noMouse'
     
 def draw():
     background(0)
+    textSize(32)
+    fill(255)
+    text("Sistema de duas molas",220,130)
     if mousePressed:
         global entrada
         entrada = 0 
