@@ -14,7 +14,8 @@ c1 = 60.0 #comprimento da mola 1
 c2 = 60.0 #comprimento da mola 2
 m1 = 5.0 #massa do peso 1
 m2 = 5.0 #massa do peso 2
-k = 0.0 #constante de retardo
+k = 0.1 #constante de retardo
+e = 1.0 #esperssura da linha 
 
 quadrado = PVector(400.0,233.33) #posição inicial do quadrado 
 tamq = 30.0 #tamanho do quadrado
@@ -43,7 +44,7 @@ def draw():
     text("Sistema de duas molas",220,130)
     if mousePressed:
         global entrada
-        entrada = 0 
+        entrada = 0
         if mouseButton == LEFT:
             global r1
             r1 = PVector.sub(PVector(mouseX,mouseY),quadrado)
@@ -119,7 +120,7 @@ def draw():
     t = millis()
     
 #desenho do quadrado
-    stroke(255)
+    #stroke(255)
     fill(200,0,0)
     rectMode(CENTER)
     rect(quadrado.x,quadrado.y,tamq,tamq)
@@ -171,7 +172,7 @@ def draw():
     
     line(x_anterior, y_anterior, s2.x - pedaco2.x * 2, s2.y - pedaco2.y * 2)
     
-    strokeWeight(1) #Espessura normal
+    strokeWeight(e) #Espessura normal
     stroke(255)
     fill(128,128,0)
     ellipse(s1.x,s1.y,tamc,tamc)
@@ -228,13 +229,13 @@ def cmp_col_quad(quadrado,tamq,tamc,vector):
         return False
     elif (quadrado.y - tamq/2 - tamc/2)  > vector.y:
         return False
-    elif dist(quadrado.x-tamq/2,quadrado.y-tamq/2, vector.x,vector.y) <= tamc/2:
+    elif dist(quadrado.x-tamq/2 ,quadrado.y-tamq/2, vector.x,vector.y) <= tamc/2:
         return True
-    elif dist(quadrado.x-tamq/2,quadrado.y+tamq/2, vector.x,vector.y) <= tamc/2:
+    elif dist(quadrado.x-tamq/2 ,quadrado.y+tamq/2, vector.x,vector.y) <= tamc/2:
         return True  
-    elif dist(quadrado.x+tamq/2,quadrado.y+tamq/2, vector.x,vector.y) <= tamc/2:
+    elif dist(quadrado.x+tamq/2 ,quadrado.y+tamq/2, vector.x,vector.y) <= tamc/2:
         return True 
-    elif dist(quadrado.x+tamq/2,quadrado.y-tamq/2, vector.x,vector.y) <= tamc/2:
+    elif dist(quadrado.x+tamq/2 ,quadrado.y-tamq/2, vector.x,vector.y) <= tamc/2:
         return True
     else:
         return False
