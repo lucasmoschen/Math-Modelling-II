@@ -18,7 +18,7 @@ k = 0.0 #constante de retardo
 
 quadrado = PVector(400.0,233.33) #posição inicial do quadrado 
 tamq = 30.0 #tamanho do quadrado
-tamc = 35.0 #diametro circunferencia
+tamc = 40.0 #diametro circunferencia
 
 #vetores Peso
 P1 = g.copy()
@@ -177,6 +177,26 @@ def draw():
     ellipse(s1.x,s1.y,tamc,tamc)
     fill(0,128,128)
     ellipse(s2.x,s2.y,tamc,tamc)
+    
+############# TRABALHO 2 #################
+
+############## COLISÃO ###################
+
+    res_1 = cmp_col_quad(quadrado,tamq,tamc,s1) #analisa se o quadrado se chocou com a massa 1
+    res_2 = cmp_col_quad(quadrado,tamq,tamc,s2) #analisa se o quadrado se chocou com a massa 2
+    res_both = cmp_col_circ(s1,s2,tamc)  #analisa se as massas se chocaram
+    
+    ###Mas o que acontece se colidir? 
+    
+    if res_1:
+        v1.mult(-1.0)
+    if res_2:
+        v2.mult(-1.0)
+    if res_both:
+        v1.mult(-1.0)
+        v2.mult(-1.0)        
+    
+##########################################
 
 #vetores posição inicial
 def r1_inicial(g,m1,m2,k1,c1):
@@ -191,16 +211,16 @@ def r2_inicial(g,m2,k2,c2):
     r2.add(PVector(0,c2+c1))
     return r2
 
-def collision_circles(s1,s2,tamc):
+def cmp_col_circ(s1,s2,tamc):
     if (s1-s2).mag() <= tamc:
         return True
     else:
         return False
 
-def collision_quad(quadrado,tamq,tamc,vector):
+def cmp_col_quad(quadrado,tamq,tamc,vector):
     #compara nos primeiros 4 if e elifs com as retas e depois com a distância ao vértices
     #assim, ele basicamente compara com a curva de menor ditancia entre quadrado e centro do circulo 
-    if (quadrado.x + tamq/2 + tamc/2) < vector.x: 
+    if (quadrado.x + tamq/2 + tamc/2) < vector.x:
         return False
     elif (quadrado.x - tamq/2 - tamc/2) > vector.x:
         return False
@@ -208,16 +228,16 @@ def collision_quad(quadrado,tamq,tamc,vector):
         return False
     elif (quadrado.y - tamq/2 - tamc/2)  > vector.y:
         return False
-    elif dist(quadrado.x-tamq/2,quadrado.x-tamq/2, vector.x,vector.y) > tamc:
-        return False
-    elif dist(quadrado.x-tamq/2,quadrado.x+tamq/2, vector.x,vector.y) > tamc:
-        return False 
-    elif dist(quadrado.x+tamq/2,quadrado.x+tamq/2, vector.x,vector.y) > tamc:
-        return False 
-    elif dist(quadrado.x+tamq/2,quadrado.x-tamq/2, vector.x,vector.y) > tamc:
-        return False
-    else:
+    elif dist(quadrado.x-tamq/2,quadrado.y-tamq/2, vector.x,vector.y) <= tamc/2:
         return True
+    elif dist(quadrado.x-tamq/2,quadrado.y+tamq/2, vector.x,vector.y) <= tamc/2:
+        return True  
+    elif dist(quadrado.x+tamq/2,quadrado.y+tamq/2, vector.x,vector.y) <= tamc/2:
+        return True 
+    elif dist(quadrado.x+tamq/2,quadrado.y-tamq/2, vector.x,vector.y) <= tamc/2:
+        return True
+    else:
+        return False
     
 def keyPressed():
     global entrada
