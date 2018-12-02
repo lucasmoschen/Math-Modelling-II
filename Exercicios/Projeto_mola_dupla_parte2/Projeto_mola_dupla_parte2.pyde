@@ -191,6 +191,34 @@ def r2_inicial(g,m2,k2,c2):
     r2.add(PVector(0,c2+c1))
     return r2
 
+def collision_circles(s1,s2,tamc):
+    if (s1-s2).mag() <= tamc:
+        return True
+    else:
+        return False
+
+def collision_quad(quadrado,tamq,tamc,vector):
+    #compara nos primeiros 4 if e elifs com as retas e depois com a distância ao vértices
+    #assim, ele basicamente compara com a curva de menor ditancia entre quadrado e centro do circulo 
+    if (quadrado.x + tamq/2 + tamc/2) < vector.x: 
+        return False
+    elif (quadrado.x - tamq/2 - tamc/2) > vector.x:
+        return False
+    elif (quadrado.y + tamq/2 + tamc/2) < vector.y:
+        return False
+    elif (quadrado.y - tamq/2 - tamc/2)  > vector.y:
+        return False
+    elif dist(quadrado.x-tamq/2,quadrado.x-tamq/2, vector.x,vector.y) > tamc:
+        return False
+    elif dist(quadrado.x-tamq/2,quadrado.x+tamq/2, vector.x,vector.y) > tamc:
+        return False 
+    elif dist(quadrado.x+tamq/2,quadrado.x+tamq/2, vector.x,vector.y) > tamc:
+        return False 
+    elif dist(quadrado.x+tamq/2,quadrado.x-tamq/2, vector.x,vector.y) > tamc:
+        return False
+    else:
+        return True
+    
 def keyPressed():
     global entrada
     entrada = 'noMouse'
