@@ -1,5 +1,7 @@
 #Sistema Mola
 
+import random as ran
+
 #Constantes iniciais 
 
 g = PVector(0.0,9.8) #aceleracao da gravidade
@@ -15,7 +17,12 @@ c2 = 60.0 #comprimento da mola 2
 m1 = 5.0 #massa do peso 1
 m2 = 5.0 #massa do peso 2
 k = 0.1 #constante de retardo
-e = 1.0 #esperssura da linha 
+e = 1.0 #esperssura da linha
+p = 100.0
+r = ran.uniform(0.3,1) #coeficiente de restituição
+res_both_ant = False
+res_wall_1_ant = False
+res_wall_2_ant = False
 
 quadrado = PVector(400.0,233.33) #posição inicial do quadrado 
 tamq = 30.0 #tamanho do quadrado
@@ -38,7 +45,9 @@ def setup():
 entrada = 'noMouse'
     
 def draw():
-    background(0)
+    background(255)
+    fill(0)
+    rect(400,350,800 - p,700 - p)
     textSize(32)
     fill(255)
     text("Sistema de duas molas",220,130)
@@ -119,12 +128,6 @@ def draw():
     dt = (millis() - t) / 1000.0
     t = millis()
     
-#desenho do quadrado
-    #stroke(255)
-    fill(200,0,0)
-    rectMode(CENTER)
-    rect(quadrado.x,quadrado.y,tamq,tamq)
-    
 #desenho de pesos e molas        
          
     stroke(128) #Cor cinza
@@ -179,6 +182,12 @@ def draw():
     fill(0,128,128)
     ellipse(s2.x,s2.y,tamc,tamc)
     
+        
+    #desenho do quadrado
+    fill(200,0,0)
+    rectMode(CENTER)
+    rect(quadrado.x,quadrado.y,tamq,tamq)
+    
 ############# TRABALHO 2 #################
 
 ############## COLISÃO ###################
@@ -186,17 +195,44 @@ def draw():
     res_1 = cmp_col_quad(quadrado,tamq,tamc,s1) #analisa se o quadrado se chocou com a massa 1
     res_2 = cmp_col_quad(quadrado,tamq,tamc,s2) #analisa se o quadrado se chocou com a massa 2
     res_both = cmp_col_circ(s1,s2,tamc)  #analisa se as massas se chocaram
+    res_wall_1 = cmp_walls(p,tamc,s1)
+    res_wall_2 = cmp_walls(p,tamc,s2)
     
     ###Mas o que acontece se colidir? 
     
-    if res_1:
-        v1.mult(-1.0)
-    if res_2:
-        v2.mult(-1.0)
-    if res_both:
-        v1.mult(-1.0)
-        v2.mult(-1.0)        
+    #Parede
     
+    global res_wall_1_ant,res_wall_2_ant    
+    if res_wall_1[0] and not res_wall_1_ant:
+        if res_wall_1[1] == 1 or res_wall_1[1] == 3:
+            v1.y *= -1
+        else:
+            v1.x *= -1
+    if res_wall_2[0] and not res_wall_2_ant:
+        if res_wall_2[1] == 1 or res_wall_2[1] == 3:
+            v2.y *= -1
+        else:
+            v2.x *= -1
+    res_wall_1_ant = res_wall_1[0]
+    res_wall_2_ant = res_wall_2[0]
+
+            
+    global res_both_ant            
+    if res_both and not res_both_ant:
+        v_cm = (m1*v1 + m2*v2)/(m1+m2)    
+        u = s2 - s1
+        v1_cm = v1 - v_cm   
+        v2_cm = v2 - v_cm    
+        proj_v1_cm_u = (v1_cm.dot(u) / u.mag()**2) * u
+        proj_v2_cm_u = (v2_cm.dot(u) / u.mag()**2) * u
+        v1_cm = r*(v1_cm - 2*proj_v1_cm_u)
+        v2_cm = r*(v2_cm - 2*proj_v2_cm_u)
+        v1 = v1_cm + v_cm
+        v2 = v2_cm + v_cm
+        print(r)
+        
+    res_both_ant = res_both
+        
 ##########################################
 
 #vetores posição inicial
@@ -218,27 +254,39 @@ def cmp_col_circ(s1,s2,tamc):
     else:
         return False
 
-def cmp_col_quad(quadrado,tamq,tamc,vector):
+def cmp_col_quad(quadrado,tamq,tamc,circle):
     #compara nos primeiros 4 if e elifs com as retas e depois com a distância ao vértices
     #assim, ele basicamente compara com a curva de menor ditancia entre quadrado e centro do circulo 
-    if (quadrado.x + tamq/2 + tamc/2) < vector.x:
+    if (quadrado.x + tamq/2 + tamc/2) < circle.x:
         return False
-    elif (quadrado.x - tamq/2 - tamc/2) > vector.x:
+    elif (quadrado.x - tamq/2 - tamc/2) > circle.x:
         return False
-    elif (quadrado.y + tamq/2 + tamc/2) < vector.y:
+    elif (quadrado.y + tamq/2 + tamc/2) < circle.y:
         return False
-    elif (quadrado.y - tamq/2 - tamc/2)  > vector.y:
+    elif (quadrado.y - tamq/2 - tamc/2)  > circle.y:
         return False
-    elif dist(quadrado.x-tamq/2 ,quadrado.y-tamq/2, vector.x,vector.y) <= tamc/2:
-        return True
-    elif dist(quadrado.x-tamq/2 ,quadrado.y+tamq/2, vector.x,vector.y) <= tamc/2:
-        return True  
-    elif dist(quadrado.x+tamq/2 ,quadrado.y+tamq/2, vector.x,vector.y) <= tamc/2:
-        return True 
-    elif dist(quadrado.x+tamq/2 ,quadrado.y-tamq/2, vector.x,vector.y) <= tamc/2:
-        return True
+    elif circle.x <= quadrado.x-tamq/2 and circle.y <= quadrado.y-tamq/2 and dist(quadrado.x-tamq/2 ,quadrado.y-tamq/2, circle.x,circle.y) > tamc/2:
+        return False
+    elif circle.x <= quadrado.x-tamq/2 and circle.y >= quadrado.y+tamq/2 and dist(quadrado.x-tamq/2 ,quadrado.y+tamq/2, circle.x,circle.y) > tamc/2:
+        return False  
+    elif circle.x >= quadrado.x+tamq/2 and circle.y >= quadrado.y+tamq/2 and dist(quadrado.x+tamq/2 ,quadrado.y+tamq/2, circle.x,circle.y) > tamc/2:
+        return False 
+    elif circle.x >= quadrado.x+tamq/2 and circle.y <= quadrado.y-tamq/2 and dist(quadrado.x+tamq/2 ,quadrado.y-tamq/2, circle.x,circle.y) > tamc/2:
+        return False
     else:
-        return False
+        return True
+    
+def cmp_walls(p,tamc,circle):
+    if p/2 + tamc/2 >= circle.y:
+        return [True, 1]
+    elif 800 - p/2 - tamc/2 <= circle.x:
+        return [True, 2]
+    elif 700 - p/2 - tamc/2 <= circle.y:
+        return [True, 3]
+    elif p/2 + tamc/2 >= circle.x:
+        return [True, 4]
+    else:
+        return [False]
     
 def keyPressed():
     global entrada
@@ -246,3 +294,6 @@ def keyPressed():
     global v1,v2
     v1 = PVector(0.0,0.0)
     v2 = PVector(0.0,0.0)
+    global r
+    r = ran.uniform(0.5,1) #coeficiente de restituição
+    print(r)
