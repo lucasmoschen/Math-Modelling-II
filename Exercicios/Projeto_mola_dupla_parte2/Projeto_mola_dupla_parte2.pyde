@@ -2,6 +2,7 @@ import random as ran
 from comparing import Compare
 from bola import Bolas
 from collision import Collision 
+from spring import Spring 
 
 ################ Sistema Mola ####################
 
@@ -67,7 +68,7 @@ resb_quad_ant = False
 
 def setup():
     size(largura,comprimento) 
-    frameRate(60)
+    frameRate(600)
     
 entrada = 'noMouse'
     
@@ -157,50 +158,9 @@ def draw():
     
 #desenho de pesos e molas        
          
-    stroke(128) #Cor cinza
-    strokeWeight(4) #Maior espessura
-    
-    pedaco1 = r1.copy() #Vetor tamanho do pedaco
-    pedaco1.div(10) #1/10 do tamanho da mola
-    line(quadrado.x, quadrado.y, quadrado.x + pedaco1.x * 2, quadrado.y + pedaco1.y * 2) #Primeira linha
-    line(s1.x - pedaco1.x * 2, s1.y - pedaco1.y * 2, s1.x, s1.y) #Última linha
-    
-    #Inicia com x e y anteriores
-    x_anterior = quadrado.x + pedaco1.x * 2
-    y_anterior = quadrado.y + pedaco1.y * 2
-    
-    i = 0    
-    for pedaco in range(3, 8, 2):
-        lado = PVector(-pedaco1.y, pedaco1.x)
-        lado.div(lado.mag())
-        lado.mult(15)
-        line(x_anterior, y_anterior, quadrado.x + pedaco1.x * pedaco + lado.x * (-1)**i, quadrado.y + pedaco1.y * pedaco + lado.y * (-1)**i)
-        x_anterior = quadrado.x + pedaco1.x * pedaco + lado.x * (-1)**i
-        y_anterior = quadrado.y + pedaco1.y * pedaco + lado.y * (-1)**i
-        i += 1
-    
-    line(x_anterior, y_anterior, s1.x - pedaco1.x * 2, s1.y - pedaco1.y * 2)
-    
-    pedaco2 = r12.copy() #Vetor tamanho do pedaco
-    pedaco2.div(10) #1/10 do tamanho da mola
-    line(s1.x, s1.y, s1.x + pedaco2.x * 2, s1.y + pedaco2.y * 2) #Primeira linha
-    line(s2.x - pedaco2.x * 2, s2.y - pedaco2.y * 2, s2.x, s2.y) #Última linha
-    
-    #Inicia com x e y anteriores
-    x_anterior = s1.x + pedaco2.x * 2
-    y_anterior = s1.y + pedaco2.y * 2
-    
-    i = 0    
-    for pedaco in range(3, 8, 2):
-        lado = PVector(-pedaco2.y, pedaco2.x)
-        lado.div(lado.mag())
-        lado.mult(15)
-        line(x_anterior, y_anterior, s1.x + pedaco2.x * pedaco + lado.x * (-1)**i, s1.y + pedaco2.y * pedaco + lado.y * (-1)**i)
-        x_anterior = s1.x + pedaco2.x * pedaco + lado.x * (-1)**i
-        y_anterior = s1.y + pedaco2.y * pedaco + lado.y * (-1)**i
-        i += 1
-    
-    line(x_anterior, y_anterior, s2.x - pedaco2.x * 2, s2.y - pedaco2.y * 2)
+    spring = Spring()
+    spring.draw_spring(r1, quadrado, s1)
+    spring.draw_spring(r12, s1, s2)
     
     strokeWeight(e) #Espessura normal
     stroke(255)
