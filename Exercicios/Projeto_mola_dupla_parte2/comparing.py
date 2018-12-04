@@ -7,7 +7,7 @@ class Compare:
     
     def col_circ(self,s1,s2,tamc):
         #analisa se há colisão entre duas massas
-        if (s1-s2).mag() <= tamc:
+        if (s2-s1).mag() <= tamc:
             return [True]
         else:
             return [False]
@@ -55,7 +55,7 @@ class Compare:
                         area = 7                
             return [True, area]
         
-    def walls(self,largura,comprimento,p,tamc,circle):
+    def col_walls(self,largura,comprimento,p,tamc,circle):
         # compara com cada parede se há colisão
         if p/2 + tamc/2 >= circle.y:
             return [True, 1]
