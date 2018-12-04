@@ -1,7 +1,10 @@
 import random as ran
-from comparing import Compare 
+from comparing import Compare
+from bola import Bolas
 
-#Sistema Mola
+################ Sistema Mola ####################
+
+################## Parte II ######################
 
 #Constantes iniciais 
 
@@ -22,7 +25,7 @@ c1 = 60.0 #comprimento da mola 1
 c2 = 60.0 #comprimento da mola 2
 m1 = 5.0 #massa do peso 1
 m2 = 5.0 #massa do peso 2
-k = 0.1 #constante de retardo
+k = 0.0 #constante de retardo
 r = ran.uniform(0.3,1) #coeficiente de restituição
 
 #resultados iniciais para comparação 
@@ -55,6 +58,9 @@ epg = 0
 ec = 0
 epe = 0
 et = 0
+
+#Variáveis das bolas aleatórias
+bola1,b1 = False,False ##ambas servem para uso específico
 
 def setup():
     size(largura,comprimento) 
@@ -140,37 +146,6 @@ def draw():
     s1.add(quadrado)
     s2 = r2.copy()
     s2.add(quadrado)  
-    
-    ### Trabalho 2
-    ### Energia
-    
-    global t0, inicio, epg, ec, epe, et
-    
-    if inicio or millis() - t0 > 200:
-        inicio = False
-        epg1 = m1*g.mag()*(comprimento - s1.y - p/2)
-        epg2 = m2*g.mag()*(comprimento - s2.y - p/2)
-        epg = epg1 + epg2
-        
-        ec1 = 1.0/2.0*m1*(v1.mag())**2
-        ec2 = 1.0/2.0*m2*(v2.mag())**2    
-        ec = ec1 + ec2
-        
-        epe1 = 1.0/2.0*k1*d1**2
-        epe2 = 1.0/2.0*k2*d2**2
-        epe = epe1 + epe2
-        
-        et = epg + ec + epe
-        
-        t0 = millis()
-        
-    fill(255)
-    text("Epg = {0:.2f} u.t.".format(epg/1000), p/2 + 10, comprimento - p/2 - 115)
-    text("Ec = {0:.2f} u.t.".format(ec/1000), p/2 + 10, comprimento - p/2 - 80)
-    text("Epe = {0:.2f} u.t.".format(epe/1000), p/2 + 10, comprimento - p/2 - 45)
-    text("E = {0:.2f} u.t.".format(et/1000), p/2 + 10, comprimento - p/2 - 10)
-    
-    #####
 
 #itera t
     global t
@@ -239,6 +214,36 @@ def draw():
     
 ############# TRABALHO 2 #################
 
+############### ENERGIA ##################
+    
+    global t0, inicio, epg, ec, epe, et
+    
+    if inicio or millis() - t0 > 200:
+        inicio = False
+        epg1 = m1*g.mag()*(comprimento - s1.y - p/2)
+        epg2 = m2*g.mag()*(comprimento - s2.y - p/2)
+        epg = epg1 + epg2
+        
+        ec1 = 1.0/2.0*m1*(v1.mag())**2
+        ec2 = 1.0/2.0*m2*(v2.mag())**2    
+        ec = ec1 + ec2
+        
+        epe1 = 1.0/2.0*k1*d1**2
+        epe2 = 1.0/2.0*k2*d2**2
+        epe = epe1 + epe2
+        
+        et = epg + ec + epe
+        
+        t0 = millis()
+        
+    fill(255)
+    text("Epg = {0:.2f} u.t.".format(epg/1000), p/2 + 10, comprimento - p/2 - 115)
+    text("Ec = {0:.2f} u.t.".format(ec/1000), p/2 + 10, comprimento - p/2 - 80)
+    text("Epe = {0:.2f} u.t.".format(epe/1000), p/2 + 10, comprimento - p/2 - 45)
+    text("E = {0:.2f} u.t.".format(et/1000), p/2 + 10, comprimento - p/2 - 10)
+    
+##########################################
+
 ############## COLISÃO ###################
 
     cmp = Compare()
@@ -247,6 +252,7 @@ def draw():
     res_both = cmp.col_circ(s1,s2,tamc)  #analisa se as massas se chocaram
     res_wall_1 = cmp.walls(largura,comprimento,p,tamc,s1)
     res_wall_2 = cmp.walls(largura,comprimento,p,tamc,s2)
+    
     
     ###Mas o que acontece se colidir? 
     
@@ -267,7 +273,8 @@ def draw():
             
     res_wall_1_ant = res_wall_1[0]
     res_wall_2_ant = res_wall_2[0]
-
+    
+    #entre as massas
             
     global res_both_ant
               
@@ -284,6 +291,8 @@ def draw():
         v2 = v2_cm + v_cm
         
     res_both_ant = res_both[0]
+    
+    #quadrado
     
     global res_1_ant, res_2_ant
     
@@ -323,8 +332,17 @@ def draw():
             
     res_1_ant = res_1[0]
     res_2_ant = res_2[0]
+    
+################## Para brincar ####################
+
+    if bola1:
+        global b1
+        if b1 == False:
+            b1 = Bolas(largura,comprimento,tamc,p,g,m1,dt)
+        posb1 = b1.calculus_posicion(k)
+        fill(50,60,90)
+        ellipse(posb1.x,posb1.y,tamc,tamc)
         
-##########################################
 
 #vetores posição inicial
 def r1_inicial(g,m1,m2,k1,c1):
@@ -340,10 +358,14 @@ def r2_inicial(g,m2,k2,c2):
     return r2
   
 def keyPressed():
-    global entrada
-    entrada = 'noMouse'
-    global v1,v2
-    v1 = PVector(0.0,0.0)
-    v2 = PVector(0.0,0.0)
-    global r
-    r = ran.uniform(0.5,1) #coeficiente de restituição
+    if key == 'a' or key == 'A':
+        global bola1
+        bola1 = True
+    else:
+        global entrada
+        entrada = 'noMouse'
+        global v1,v2
+        v1 = PVector(0.0,0.0)
+        v2 = PVector(0.0,0.0)
+        global r
+        r = ran.uniform(0.5,1) #coeficiente de restituição
