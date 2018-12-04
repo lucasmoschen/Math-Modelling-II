@@ -1,12 +1,18 @@
-#Sistema Mola
-
 import random as ran
+from comparing import Compare 
+
+#Sistema Mola
 
 #Constantes iniciais 
 
 g = PVector(0.0,9.8) #aceleracao da gravidade
 t = millis() #tempo inicial
 dt = millis()/1000.0
+
+e = 1.0 #esperssura da linha
+largura = 800
+comprimento = 700
+p = 100.0 #tamanho de duas paredes paralelas
 
 #constantes em relação aos pesos e às molas
 
@@ -17,18 +23,17 @@ c2 = 60.0 #comprimento da mola 2
 m1 = 5.0 #massa do peso 1
 m2 = 5.0 #massa do peso 2
 k = 0.1 #constante de retardo
-e = 1.0 #esperssura da linha
-p = 100.0
 r = ran.uniform(0.3,1) #coeficiente de restituição
+
+#resultados iniciais para comparação 
+
 res_both_ant = False
 res_wall_1_ant = False
 res_wall_2_ant = False
 res_1_ant = False
 res_2_ant = False
-largura = 800
-comprimento = 700
 
-quadrado = PVector(400.0,233.33) #posição inicial do quadrado 
+quadrado = PVector(largura/2.0,comprimento/3.0) #posição inicial do quadrado 
 tamq = 30.0 #tamanho do quadrado
 tamc = 40.0 #diametro circunferencia
 
@@ -236,11 +241,12 @@ def draw():
 
 ############## COLISÃO ###################
 
-    res_1 = cmp_col_quad(quadrado,tamq,tamc,s1) #analisa se o quadrado se chocou com a massa 1
-    res_2 = cmp_col_quad(quadrado,tamq,tamc,s2) #analisa se o quadrado se chocou com a massa 2
-    res_both = cmp_col_circ(s1,s2,tamc)  #analisa se as massas se chocaram
-    res_wall_1 = cmp_walls(p,tamc,s1)
-    res_wall_2 = cmp_walls(p,tamc,s2)
+    cmp = Compare()
+    res_1 = cmp.col_quad(quadrado,tamq,tamc,s1) #analisa se o quadrado se chocou com a massa 1
+    res_2 = cmp.col_quad(quadrado,tamq,tamc,s2) #analisa se o quadrado se chocou com a massa 2
+    res_both = cmp.col_circ(s1,s2,tamc)  #analisa se as massas se chocaram
+    res_wall_1 = cmp.walls(largura,comprimento,p,tamc,s1)
+    res_wall_2 = cmp.walls(largura,comprimento,p,tamc,s2)
     
     ###Mas o que acontece se colidir? 
     
@@ -265,7 +271,7 @@ def draw():
             
     global res_both_ant
               
-    if res_both and not res_both_ant:
+    if res_both[0] and not res_both_ant:
         v_cm = (m1*v1 + m2*v2)/(m1+m2)    
         u = s2 - s1
         v1_cm = v1 - v_cm   
@@ -277,7 +283,7 @@ def draw():
         v1 = v1_cm + v_cm
         v2 = v2_cm + v_cm
         
-    res_both_ant = res_both
+    res_both_ant = res_both[0]
     
     global res_1_ant, res_2_ant
     
@@ -332,68 +338,7 @@ def r2_inicial(g,m2,k2,c2):
     r2.mult(m2/k2+(m1+m2)/k1)
     r2.add(PVector(0,c2+c1))
     return r2
-
-def cmp_col_circ(s1,s2,tamc):
-    if (s1-s2).mag() <= tamc:
-        return True
-    else:
-        return False
-
-def cmp_col_quad(quadrado,tamq,tamc,circle):
-    #compara nos primeiros 4 if e elifs com as retas e depois com a distância ao vértices
-    #assim, ele basicamente compara com a curva de menor ditancia entre quadrado e centro do circulo 
-    if (quadrado.y - tamq/2 - tamc/2)  > circle.y:
-        return [False]
-    elif (quadrado.x + tamq/2 + tamc/2) < circle.x:
-        return [False]
-    elif (quadrado.y + tamq/2 + tamc/2) < circle.y:
-        return [False]
-    elif (quadrado.x - tamq/2 - tamc/2) > circle.x:
-        return [False]
-    elif circle.x <= quadrado.x-tamq/2 and circle.y <= quadrado.y-tamq/2 and dist(quadrado.x-tamq/2 ,quadrado.y-tamq/2, circle.x,circle.y) > tamc/2:
-        return [False]
-    elif circle.x <= quadrado.x-tamq/2 and circle.y >= quadrado.y+tamq/2 and dist(quadrado.x-tamq/2 ,quadrado.y+tamq/2, circle.x,circle.y) > tamc/2:
-        return [False] 
-    elif circle.x >= quadrado.x+tamq/2 and circle.y >= quadrado.y+tamq/2 and dist(quadrado.x+tamq/2 ,quadrado.y+tamq/2, circle.x,circle.y) > tamc/2:
-        return [False]
-    elif circle.x >= quadrado.x+tamq/2 and circle.y <= quadrado.y-tamq/2 and dist(quadrado.x+tamq/2 ,quadrado.y-tamq/2, circle.x,circle.y) > tamc/2:
-        return [False]
-    else:
-        if circle.x >= quadrado.x - tamq/2 and circle.x <= quadrado.x + tamq/2:
-            if circle.y > quadrado.y:
-                area = 3
-            else:
-                area = 1
-        elif circle.y >= quadrado.y - tamq/2 and circle.y <= quadrado.y + tamq/2:
-            if circle.x > quadrado.x:
-                area = 2
-            else:
-                area = 4
-        else:
-            if circle.x > quadrado.x:
-                if circle.y < quadrado.y:
-                    area = 5
-                else:
-                    area = 6
-            else:
-                if circle.y < quadrado.y:
-                    area = 8
-                else:
-                    area = 7                
-        return [True, area]
-    
-def cmp_walls(p,tamc,circle):
-    if p/2 + tamc/2 >= circle.y:
-        return [True, 1]
-    elif largura - p/2 - tamc/2 <= circle.x:
-        return [True, 2]
-    elif comprimento - p/2 - tamc/2 <= circle.y:
-        return [True, 3]
-    elif p/2 + tamc/2 >= circle.x:
-        return [True, 4]
-    else:
-        return [False]
-    
+  
 def keyPressed():
     global entrada
     entrada = 'noMouse'
