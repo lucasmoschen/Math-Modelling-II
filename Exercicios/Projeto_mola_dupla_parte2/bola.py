@@ -9,7 +9,7 @@ class Bolas:
             ran.uniform((p+tamc)/2,(largura-p/2-tamc/2)),
             ran.uniform((p+tamc)/2,(comprimento-p/2-tamc/2))
         )
-        self.vb = PVector(ran.uniform(100,200),ran.uniform(100,200))
+        self.vb = PVector(ran.uniform(300,400),ran.uniform(300,400))
         self.m = ran.uniform(5,15)
         self.peso = self.m*g #calcula força peso da bola 1
         self.ab = 0
