@@ -1,6 +1,7 @@
 import random as ran
 from comparing import Compare
 from bola import Bolas
+from collision import Collision 
 
 ################ Sistema Mola ####################
 
@@ -19,14 +20,14 @@ p = 100.0 #tamanho de duas paredes paralelas
 
 #constantes em relação aos pesos e às molas
 
-k1 = 6.0 #constante da mola superior 
-k2 = 6.0 #contante da mola inferior
+k1 = 20.0 #constante da mola superior 
+k2 = 20.0 #contante da mola inferior
 c1 = 60.0 #comprimento da mola 1
 c2 = 60.0 #comprimento da mola 2
 m1 = 5.0 #massa do peso 1
 m2 = 5.0 #massa do peso 2
-k = 0.0 #constante de retardo
-r = ran.uniform(0.3,1) #coeficiente de restituição
+k = 0.1 #constante de retardo
+r = ran.uniform(0.6,1) #coeficiente de restituição
 
 #resultados iniciais para comparação 
 
@@ -61,6 +62,7 @@ et = 0
 
 #Variáveis das bolas aleatórias
 bola1,b1 = False,False ##ambas servem para uso específico
+resb_wall_ant = False
 
 def setup():
     size(largura,comprimento) 
@@ -250,8 +252,8 @@ def draw():
     res_1 = cmp.col_quad(quadrado,tamq,tamc,s1) #analisa se o quadrado se chocou com a massa 1
     res_2 = cmp.col_quad(quadrado,tamq,tamc,s2) #analisa se o quadrado se chocou com a massa 2
     res_both = cmp.col_circ(s1,s2,tamc)  #analisa se as massas se chocaram
-    res_wall_1 = cmp.walls(largura,comprimento,p,tamc,s1)
-    res_wall_2 = cmp.walls(largura,comprimento,p,tamc,s2)
+    res_wall_1 = cmp.col_walls(largura,comprimento,p,tamc,s1)
+    res_wall_2 = cmp.col_walls(largura,comprimento,p,tamc,s2)
     
     
     ###Mas o que acontece se colidir? 
@@ -259,37 +261,23 @@ def draw():
     #Parede
     
     global res_wall_1_ant,res_wall_2_ant 
-       
     if res_wall_1[0] and not res_wall_1_ant:
-        if res_wall_1[1] == 1 or res_wall_1[1] == 3:
-            v1.y *= -1
-        else:
-            v1.x *= -1
+        colisao = Collision(m1,v1)
+        v = colisao.walls(res_wall_1)        
     if res_wall_2[0] and not res_wall_2_ant:
-        if res_wall_2[1] == 1 or res_wall_2[1] == 3:
-            v2.y *= -1
-        else:
-            v2.x *= -1
-            
+        colisao = Collision(m2,v2)
+        v2 = colisao.walls(res_wall_2)            
     res_wall_1_ant = res_wall_1[0]
     res_wall_2_ant = res_wall_2[0]
     
     #entre as massas
             
-    global res_both_ant
-              
+    global res_both_ant                        
     if res_both[0] and not res_both_ant:
-        v_cm = (m1*v1 + m2*v2)/(m1+m2)    
-        u = s2 - s1
-        v1_cm = v1 - v_cm   
-        v2_cm = v2 - v_cm    
-        proj_v1_cm_u = (v1_cm.dot(u) / u.mag()**2) * u
-        proj_v2_cm_u = (v2_cm.dot(u) / u.mag()**2) * u
-        v1_cm = r*(v1_cm - 2*proj_v1_cm_u)
-        v2_cm = r*(v2_cm - 2*proj_v2_cm_u)
-        v1 = v1_cm + v_cm
-        v2 = v2_cm + v_cm
-        
+        colisao = Collision(m1,v1)
+        vels = colisao.circle(s1,s2,m2,v2,r)
+        v1 = vels[0]
+        v2 = vels[1]      
     res_both_ant = res_both[0]
     
     #quadrado
@@ -297,53 +285,29 @@ def draw():
     global res_1_ant, res_2_ant
     
     if res_1[0] and not res_1_ant:
-        if res_1[1] == 1 or res_1[1] == 3:
-            v1.y *= -1
-        elif res_1[1] == 2 or res_1[1] == 4:
-            v1.x *= -1
-        else:
-            if res_1[1] == 5:
-                u = s1 - PVector(quadrado.x + tamq/2, quadrado.y - tamq/2)
-            elif res_1[1] == 6:
-                u = s1 - PVector(quadrado.x + tamq/2, quadrado.y + tamq/2)
-            elif res_1[1] == 7:
-                u = s1 - PVector(quadrado.x - tamq/2, quadrado.y + tamq/2)
-            else:
-                u = s1 - PVector(quadrado.x - tamq/2, quadrado.y - tamq/2)
-            proj_v1_u = (v1.dot(u) / u.mag()**2) * u
-            v1 = v1 - 2*proj_v1_u
-            
+        colisao = Collision(m1,v1)
+        v1 = colisao.square(res_1,s1,quadrado,tamq)
     if res_2[0] and not res_2_ant:
-        if res_2[1] == 1 or res_2[1] == 3:
-            v2.y *= -1
-        elif res_2[1] == 2 or res_2[1] == 4:
-            v2.x *= -1
-        else:
-            if res_2[1] == 5:
-                u = s2 - PVector(quadrado.x + tamq/2, quadrado.y - tamq/2)
-            elif res_2[1] == 6:
-                u = s2 - PVector(quadrado.x + tamq/2, quadrado.y + tamq/2)
-            elif res_2[1] == 7:
-                u = s2 - PVector(quadrado.x - tamq/2, quadrado.y + tamq/2)
-            else:
-                u = s2 - PVector(quadrado.x - tamq/2, quadrado.y - tamq/2)
-            proj_v2_u = (v2.dot(u) / u.mag()**2) * u
-            v2 = v2 - 2*proj_v2_u
-            
+        colisao = Collision(m2,v2)
+        v2 = colisao.square(res_2,s2,quadrado,tamq)        
     res_1_ant = res_1[0]
     res_2_ant = res_2[0]
     
 ################## Para brincar ####################
 
     if bola1:
-        global b1
+        global b1,resb_wall_ant
         if b1 == False:
-            b1 = Bolas(largura,comprimento,tamc,p,g,m1,dt)
+            b1 = Bolas(largura,comprimento,tamc,p,g,dt)
         posb1 = b1.calculus_posicion(k)
         fill(50,60,90)
         ellipse(posb1.x,posb1.y,tamc,tamc)
+        resb_wall = cmp.col_walls(largura,comprimento,p,tamc,posb1)
+        if resb_wall[0] and not resb_wall_ant:
+            colisao3 = Collision(b1.m,b1.vb)
+            b1.vb = colisao3.walls(resb_wall)
+        resb_wall_ant = resb_wall[0]
         
-
 #vetores posição inicial
 def r1_inicial(g,m1,m2,k1,c1):
     r1 = g.copy()
