@@ -23,6 +23,10 @@ r = ran.uniform(0.3,1) #coeficiente de restituição
 res_both_ant = False
 res_wall_1_ant = False
 res_wall_2_ant = False
+res_1_ant = False
+res_2_ant = False
+largura = 800
+comprimento = 700
 
 quadrado = PVector(400.0,233.33) #posição inicial do quadrado 
 tamq = 30.0 #tamanho do quadrado
@@ -38,8 +42,17 @@ P2.mult(m2)
 v1 = PVector(0.0,0.0)
 v2 = PVector(0.0,0.0)
 
+#Variáveis do cálculo da energia
+
+t0 = millis() #tempo inicial do retardo na atualização da energia
+inicio = True
+epg = 0
+ec = 0
+epe = 0
+et = 0
+
 def setup():
-    size(800,700) 
+    size(largura,comprimento) 
     frameRate(60)
     
 entrada = 'noMouse'
@@ -47,7 +60,7 @@ entrada = 'noMouse'
 def draw():
     background(255)
     fill(0)
-    rect(400,350,800 - p,700 - p)
+    rect(400,350,largura - p,comprimento - p)
     textSize(32)
     fill(255)
     text("Sistema de duas molas",220,130)
@@ -121,7 +134,38 @@ def draw():
     s1 = r1.copy()
     s1.add(quadrado)
     s2 = r2.copy()
-    s2.add(quadrado)
+    s2.add(quadrado)  
+    
+    ### Trabalho 2
+    ### Energia
+    
+    global t0, inicio, epg, ec, epe, et
+    
+    if inicio or millis() - t0 > 200:
+        inicio = False
+        epg1 = m1*g.mag()*(comprimento - s1.y - p/2)
+        epg2 = m2*g.mag()*(comprimento - s2.y - p/2)
+        epg = epg1 + epg2
+        
+        ec1 = 1.0/2.0*m1*(v1.mag())**2
+        ec2 = 1.0/2.0*m2*(v2.mag())**2    
+        ec = ec1 + ec2
+        
+        epe1 = 1.0/2.0*k1*d1**2
+        epe2 = 1.0/2.0*k2*d2**2
+        epe = epe1 + epe2
+        
+        et = epg + ec + epe
+        
+        t0 = millis()
+        
+    fill(255)
+    text("Epg = {0:.2f} u.t.".format(epg/1000), p/2 + 10, comprimento - p/2 - 115)
+    text("Ec = {0:.2f} u.t.".format(ec/1000), p/2 + 10, comprimento - p/2 - 80)
+    text("Epe = {0:.2f} u.t.".format(epe/1000), p/2 + 10, comprimento - p/2 - 45)
+    text("E = {0:.2f} u.t.".format(et/1000), p/2 + 10, comprimento - p/2 - 10)
+    
+    #####
 
 #itera t
     global t
@@ -202,7 +246,8 @@ def draw():
     
     #Parede
     
-    global res_wall_1_ant,res_wall_2_ant    
+    global res_wall_1_ant,res_wall_2_ant 
+       
     if res_wall_1[0] and not res_wall_1_ant:
         if res_wall_1[1] == 1 or res_wall_1[1] == 3:
             v1.y *= -1
@@ -213,11 +258,13 @@ def draw():
             v2.y *= -1
         else:
             v2.x *= -1
+            
     res_wall_1_ant = res_wall_1[0]
     res_wall_2_ant = res_wall_2[0]
 
             
-    global res_both_ant            
+    global res_both_ant
+              
     if res_both and not res_both_ant:
         v_cm = (m1*v1 + m2*v2)/(m1+m2)    
         u = s2 - s1
@@ -229,9 +276,47 @@ def draw():
         v2_cm = r*(v2_cm - 2*proj_v2_cm_u)
         v1 = v1_cm + v_cm
         v2 = v2_cm + v_cm
-        print(r)
         
     res_both_ant = res_both
+    
+    global res_1_ant, res_2_ant
+    
+    if res_1[0] and not res_1_ant:
+        if res_1[1] == 1 or res_1[1] == 3:
+            v1.y *= -1
+        elif res_1[1] == 2 or res_1[1] == 4:
+            v1.x *= -1
+        else:
+            if res_1[1] == 5:
+                u = s1 - PVector(quadrado.x + tamq/2, quadrado.y - tamq/2)
+            elif res_1[1] == 6:
+                u = s1 - PVector(quadrado.x + tamq/2, quadrado.y + tamq/2)
+            elif res_1[1] == 7:
+                u = s1 - PVector(quadrado.x - tamq/2, quadrado.y + tamq/2)
+            else:
+                u = s1 - PVector(quadrado.x - tamq/2, quadrado.y - tamq/2)
+            proj_v1_u = (v1.dot(u) / u.mag()**2) * u
+            v1 = v1 - 2*proj_v1_u
+            
+    if res_2[0] and not res_2_ant:
+        if res_2[1] == 1 or res_2[1] == 3:
+            v2.y *= -1
+        elif res_2[1] == 2 or res_2[1] == 4:
+            v2.x *= -1
+        else:
+            if res_2[1] == 5:
+                u = s2 - PVector(quadrado.x + tamq/2, quadrado.y - tamq/2)
+            elif res_2[1] == 6:
+                u = s2 - PVector(quadrado.x + tamq/2, quadrado.y + tamq/2)
+            elif res_2[1] == 7:
+                u = s2 - PVector(quadrado.x - tamq/2, quadrado.y + tamq/2)
+            else:
+                u = s2 - PVector(quadrado.x - tamq/2, quadrado.y - tamq/2)
+            proj_v2_u = (v2.dot(u) / u.mag()**2) * u
+            v2 = v2 - 2*proj_v2_u
+            
+    res_1_ant = res_1[0]
+    res_2_ant = res_2[0]
         
 ##########################################
 
@@ -257,31 +342,52 @@ def cmp_col_circ(s1,s2,tamc):
 def cmp_col_quad(quadrado,tamq,tamc,circle):
     #compara nos primeiros 4 if e elifs com as retas e depois com a distância ao vértices
     #assim, ele basicamente compara com a curva de menor ditancia entre quadrado e centro do circulo 
-    if (quadrado.x + tamq/2 + tamc/2) < circle.x:
-        return False
-    elif (quadrado.x - tamq/2 - tamc/2) > circle.x:
-        return False
+    if (quadrado.y - tamq/2 - tamc/2)  > circle.y:
+        return [False]
+    elif (quadrado.x + tamq/2 + tamc/2) < circle.x:
+        return [False]
     elif (quadrado.y + tamq/2 + tamc/2) < circle.y:
-        return False
-    elif (quadrado.y - tamq/2 - tamc/2)  > circle.y:
-        return False
+        return [False]
+    elif (quadrado.x - tamq/2 - tamc/2) > circle.x:
+        return [False]
     elif circle.x <= quadrado.x-tamq/2 and circle.y <= quadrado.y-tamq/2 and dist(quadrado.x-tamq/2 ,quadrado.y-tamq/2, circle.x,circle.y) > tamc/2:
-        return False
+        return [False]
     elif circle.x <= quadrado.x-tamq/2 and circle.y >= quadrado.y+tamq/2 and dist(quadrado.x-tamq/2 ,quadrado.y+tamq/2, circle.x,circle.y) > tamc/2:
-        return False  
+        return [False] 
     elif circle.x >= quadrado.x+tamq/2 and circle.y >= quadrado.y+tamq/2 and dist(quadrado.x+tamq/2 ,quadrado.y+tamq/2, circle.x,circle.y) > tamc/2:
-        return False 
+        return [False]
     elif circle.x >= quadrado.x+tamq/2 and circle.y <= quadrado.y-tamq/2 and dist(quadrado.x+tamq/2 ,quadrado.y-tamq/2, circle.x,circle.y) > tamc/2:
-        return False
+        return [False]
     else:
-        return True
+        if circle.x >= quadrado.x - tamq/2 and circle.x <= quadrado.x + tamq/2:
+            if circle.y > quadrado.y:
+                area = 3
+            else:
+                area = 1
+        elif circle.y >= quadrado.y - tamq/2 and circle.y <= quadrado.y + tamq/2:
+            if circle.x > quadrado.x:
+                area = 2
+            else:
+                area = 4
+        else:
+            if circle.x > quadrado.x:
+                if circle.y < quadrado.y:
+                    area = 5
+                else:
+                    area = 6
+            else:
+                if circle.y < quadrado.y:
+                    area = 8
+                else:
+                    area = 7                
+        return [True, area]
     
 def cmp_walls(p,tamc,circle):
     if p/2 + tamc/2 >= circle.y:
         return [True, 1]
-    elif 800 - p/2 - tamc/2 <= circle.x:
+    elif largura - p/2 - tamc/2 <= circle.x:
         return [True, 2]
-    elif 700 - p/2 - tamc/2 <= circle.y:
+    elif comprimento - p/2 - tamc/2 <= circle.y:
         return [True, 3]
     elif p/2 + tamc/2 >= circle.x:
         return [True, 4]
@@ -296,4 +402,3 @@ def keyPressed():
     v2 = PVector(0.0,0.0)
     global r
     r = ran.uniform(0.5,1) #coeficiente de restituição
-    print(r)
