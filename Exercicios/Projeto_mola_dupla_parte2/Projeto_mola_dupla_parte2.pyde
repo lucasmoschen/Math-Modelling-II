@@ -9,7 +9,7 @@ from collision import Collision
 
 #Constantes iniciais 
 
-g = PVector(0.0,9.8) #aceleracao da gravidade
+g = PVector(0.0,98.0) #aceleracao da gravidade
 t = millis() #tempo inicial
 dt = millis()/1000.0
 
@@ -63,6 +63,7 @@ et = 0
 #Variáveis das bolas aleatórias
 bola1,b1 = False,False ##ambas servem para uso específico
 resb_wall_ant = False
+resb_quad_ant = False
 
 def setup():
     size(largura,comprimento) 
@@ -296,7 +297,7 @@ def draw():
 ################## Para brincar ####################
 
     if bola1:
-        global b1,resb_wall_ant
+        global b1,resb_wall_ant,resb_quad_ant
         if b1 == False:
             b1 = Bolas(largura,comprimento,tamc,p,g,dt)
         posb1 = b1.calculus_posicion(k)
@@ -304,9 +305,19 @@ def draw():
         ellipse(posb1.x,posb1.y,tamc,tamc)
         resb_wall = cmp.col_walls(largura,comprimento,p,tamc,posb1)
         if resb_wall[0] and not resb_wall_ant:
-            colisao3 = Collision(b1.m,b1.vb)
-            b1.vb = colisao3.walls(resb_wall)
+            colisao = Collision(b1.m,b1.vb)
+            b1.vb = colisao.walls(resb_wall)
         resb_wall_ant = resb_wall[0]
+        
+        resb_quad = cmp.col_quad(quadrado,tamq,tamc,posb1)
+        if resb_quad[0] and not resb_quad_ant:
+            colisao = Collision(b1.m,b1.vb)
+            b1.vb = colisao.square(resb_quad,posb1,quadrado,tamq)
+        resb_quad_ant = resb_quad[0]
+        
+        resb_both_1 = cmp.col_circ(s1,posb1,tamc)
+        if resb_b:
+            pass
         
 #vetores posição inicial
 def r1_inicial(g,m1,m2,k1,c1):
