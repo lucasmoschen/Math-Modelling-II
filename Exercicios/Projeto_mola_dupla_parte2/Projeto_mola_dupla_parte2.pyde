@@ -64,6 +64,8 @@ et = 0
 bola1,b1 = False,False ##ambas servem para uso específico
 resb_wall_ant = False
 resb_quad_ant = False
+resb_both_1_ant = False
+resb_both_2_ant = False
 
 def setup():
     size(largura,comprimento) 
@@ -297,7 +299,7 @@ def draw():
 ################## Para brincar ####################
 
     if bola1:
-        global b1,resb_wall_ant,resb_quad_ant
+        global b1,resb_wall_ant,resb_quad_ant,resb_both_1_ant, resb_both_2_ant
         if b1 == False:
             b1 = Bolas(largura,comprimento,tamc,p,g,dt)
         posb1 = b1.calculus_posicion(k)
@@ -316,8 +318,20 @@ def draw():
         resb_quad_ant = resb_quad[0]
         
         resb_both_1 = cmp.col_circ(s1,posb1,tamc)
-        if resb_b:
-            pass
+        if resb_both_1[0] and not resb_both_1_ant:
+            colisao = Collision(b1.m,b1.vb)
+            vels = colisao.circle(posb1,s1,m1,v1,r)
+            b1.vb = vels[0]
+            v1 = vels[1]
+        resb_both_1_ant = resb_both_1[0]
+        
+        resb_both_2 = cmp.col_circ(s2,posb1,tamc)
+        if resb_both_2[0] and not resb_both_2_ant:
+            colisao = Collision(b1.m,b1.vb)
+            vels = colisao.circle(posb1,s2,m2,v2,r)
+            b1.vb = vels[0]
+            v2 = vels[1]
+        resb_both_2_ant = resb_both_2[0]
         
 #vetores posição inicial
 def r1_inicial(g,m1,m2,k1,c1):
