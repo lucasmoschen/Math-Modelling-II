@@ -117,18 +117,7 @@ def draw():
 
     spring.draw_spring(r1, quadrado, s1)
     spring.draw_spring(r12, s1, s2)
-    
-<<<<<<< HEAD
-    strokeWeight(1) #Espessura normal
-    stroke(255)
-    fill(128,128,0)
-    ellipse(s1.x,s1.y,tamc,tamc)
-    fill(0,128,128)
-    ellipse(s2.x,s2.y,tamc,tamc)
-    
-=======
-    masses.draw_masses(e)    
->>>>>>> c59cf6b9100694b34654ce0c8b61dc9d0d60e288
+    masses.draw_masses(e)
         
     #desenho do quadrado
     fill(200,0,0)
