@@ -6,9 +6,11 @@ class Bolas:
     
     def __init__(self,largura,comprimento,tamc,p,g):
         self.tamc = tamc
+        self.largura = largura
+        self.comprimento = comprimento
         self.posb = PVector(
-            ran.uniform((p+self.tamc)/2,(largura-p/2-self.tamc/2)),
-            ran.uniform((p+self.tamc)/2,(comprimento-p/2-self.tamc/2))
+            ran.uniform((p+self.tamc)/2,(self.largura-p/2-self.tamc/2)),
+            ran.uniform((p+self.tamc)/2,(self.comprimento-p/2-self.tamc/2))
         )
         self.vb = PVector(ran.uniform(300,400),ran.uniform(300,400))
         self.m = ran.uniform(5,15)
@@ -44,9 +46,11 @@ class Bolas:
         self.posb = self.metodo_euler(self.vb,self.ab,dt)
         return self.posb
     
-    def draw_balls(self,k,dt):
+    def draw_balls(self,k,p,dt):
         self.posb = self.calculus_posicion(k,dt)
-        fill(50,60,90)
+        if self.posb.y >= self.comprimento - p/2 - self.tamc/2:
+            self.posb.y = self.comprimento - p/2 - self.tamc/2 
+        fill(50,60,90)         
         ellipse(self.posb.x,self.posb.y,self.tamc,self.tamc)
         
             
