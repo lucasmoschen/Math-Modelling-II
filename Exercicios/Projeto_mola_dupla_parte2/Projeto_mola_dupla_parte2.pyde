@@ -342,6 +342,6 @@ def keyPressed():
     else:
         global entrada
         entrada = 'noMouse'
-        global r
+        global r,bola1,bola2,bola3,b1,b2,b3
         r = ran.uniform(0.6,1) #coeficiente de restituição
-        bola1,bola2,bola3 = False,False,False
+        bola1,bola2,bola3,b1,b2,b3 = False,False,False,False,False,False

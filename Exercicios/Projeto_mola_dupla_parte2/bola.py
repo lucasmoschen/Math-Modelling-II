@@ -12,10 +12,16 @@ class Bolas:
         )
         self.vb = PVector(ran.uniform(300,400),ran.uniform(300,400))
         self.m = ran.uniform(5,15)
-        self.peso = self.m*g #calcula força peso da bola 1
+        self.g = g
+        self.peso = self.m*self.g #calcula força peso da bola 1
         self.ab = 0
-        self.epg = self.m*g.mag()*(700-self.posb.y-p/2)
+        self.epg = 0
+        self.ec = 0
+        
+    def energy(self,p):
+        self.epg = self.m*self.g.mag()*(700-self.posb.y-p/2)
         self.ec = 1.0/2.0*self.m*(self.vb.mag())**2
+        
     
     def calculus_aceleration(self,k):
         Frb = (-k)*self.vb #calcula força de retardo
