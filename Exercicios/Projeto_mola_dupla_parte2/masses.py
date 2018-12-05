@@ -93,20 +93,3 @@ class Masses:
         ellipse(self.s1.x, self.s1.y, self.tamc, self.tamc)
         fill(0, 128, 128)
         ellipse(self.s2.x, self.s2.y, self.tamc, self.tamc)
-        
-    def energy(self, comprimento, p, d1, d2):        
-        epg1 = self.m1*self.g.mag()*(comprimento - self.s1.y - p/2)
-        epg2 = self.m2*self.g.mag()*(comprimento - self.s2.y - p/2)
-        epg = epg1 + epg2
-        
-        ec1 = 1.0/2.0*self.m1*(self.v1.mag())**2
-        ec2 = 1.0/2.0*self.m2*(self.v2.mag())**2    
-        ec = ec1 + ec2
-        
-        epe1 = 1.0/2.0*self.k1*d1**2
-        epe2 = 1.0/2.0*self.k2*d2**2
-        epe = epe1 + epe2
-        
-        et = epg + ec + epe
-        
-        return epg, ec, epe, et
