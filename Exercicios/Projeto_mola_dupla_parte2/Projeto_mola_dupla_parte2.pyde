@@ -119,19 +119,8 @@ def draw():
     
     if inicio or millis() - t0 > 200:
         inicio = False
-        epg1 = m1*g.mag()*(comprimento - s1.y - p/2)
-        epg2 = m2*g.mag()*(comprimento - s2.y - p/2)
-        epg = epg1 + epg2
         
-        ec1 = 1.0/2.0*m1*(v1.mag())**2
-        ec2 = 1.0/2.0*m2*(v2.mag())**2    
-        ec = ec1 + ec2
-        
-        epe1 = 1.0/2.0*k1*d1**2
-        epe2 = 1.0/2.0*k2*d2**2
-        epe = epe1 + epe2
-        
-        et = epg + ec + epe
+        epg, ec, epe, et = masses.energy(comprimento, p, d1, d2)
         
         t0 = millis()
         
