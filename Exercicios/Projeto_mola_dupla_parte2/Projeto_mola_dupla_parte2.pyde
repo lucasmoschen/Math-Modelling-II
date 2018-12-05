@@ -3,6 +3,7 @@ from comparing import Compare
 from bola import Bolas
 from collision import Collision 
 from spring import Spring 
+from masses import Masses
 
 ################ Sistema Mola ####################
 
@@ -48,10 +49,6 @@ P1.mult(m1)
 P2 = g.copy()
 P2.mult(m2)
 
-#vetores velocidade inicial
-v1 = PVector(0.0,0.0)
-v2 = PVector(0.0,0.0)
-
 #Variáveis do cálculo da energia
 
 t0 = millis() #tempo inicial do retardo na atualização da energia
@@ -69,108 +66,47 @@ resb_both_1_ant = False
 resb_both_2_ant = False
 
 def setup():
+    global masses, spring
     size(largura,comprimento) 
     frameRate(600)
+    
+    spring = Spring()
+    masses = Masses(g, m1, m2, k1, k2, c1, c2, r, quadrado, dt, tamc, k)
     
 entrada = 'noMouse'
     
 def draw():
+    global masses, spring, dt, t
     background(255)
     fill(0)
     rect(400,350,largura - p,comprimento - p)
     textSize(32)
     fill(255)
     text("Sistema de duas molas",220,130)
+    
     if mousePressed:
         global entrada
         entrada = 0
         if mouseButton == LEFT:
-            global r1
-            r1 = PVector.sub(PVector(mouseX,mouseY),quadrado)
+            masses.r1 = PVector.sub(PVector(mouseX,mouseY),quadrado)
         elif mouseButton == RIGHT:
-            global r2
-            r2 = PVector.sub(PVector(mouseX,mouseY),quadrado)
+            masses.r2 = PVector.sub(PVector(mouseX,mouseY),quadrado)
     else:
         if entrada == 'noMouse':
-            r1 = r1_inicial(g,m1,m2,k1,c1)
-            r2 = r2_inicial(g,m2,k2,c2)
-#calcula a deformação da mola 1
-    d1 = r1.mag() - c1
-#Força mola 1
-    Fm1 = r1.copy()
-    tamanho = Fm1.mag()
-    Fm1.div(tamanho)
-    Fm1.mult(-k1 * d1)
-#calcula vetor r12
-    r12 = PVector.sub(r2,r1)
-#calcula a deformação da mola 2
-    d2 =  r12.mag() - c2
-    Fm2 = r12.copy()
-    tamanho2 = Fm2.mag()
-    Fm2.div(tamanho2)
-    Fm2.mult(-k2*d2)
-#calcula as forças de retardo
-    global v1, v2
-    Fr1 = v1.copy()
-    Fr1.mult(-k)
-    Fr2 = v2.copy()
-    Fr2.mult(-k)
-#calcula Forças resultantes
-    F1 = P1.copy()
-    F1.sub(Fm2)
-    F1.add(Fm1)
-    F1.add(Fr1)
-    F2 = P2.copy()
-    F2.add(Fm2)
-    F2.add(Fr2)
-#calcula as acelerações    
-    a1 = F1.copy()
-    a1.div(m1)
-    a2 = F2.copy()
-    a2.div(m2)
+            masses.__init__(g, m1, m2, k1, k2, c1, c2, r, quadrado, dt, tamc, k)
     
-#Método de Euler
-    global dt
-    v1_0 = v1.copy()
-    v1 = a1.copy()
-    v1.mult(dt)
-    v1.add(v1_0)
+    masses.dt = dt
+    s1, s2, v1, v2, r1, r12, r2, d1, d2 = masses.calculations()
     
-    v2_0 = v2.copy()
-    v2 = a2.copy()
-    v2.mult(dt)
-    v2.add(v2_0)
-    
-    dr1 = v1.copy()
-    dr1.mult(dt)
-    dr2 = v2.copy()
-    dr2.mult(dt)
-    r1.add(dr1)
-    r2.add(dr2)
-    
-    s1 = r1.copy()
-    s1.add(quadrado)
-    s2 = r2.copy()
-    s2.add(quadrado)  
-
-#itera t
-    global t
     dt = (millis() - t) / 1000.0
     t = millis()
     
-#desenho de pesos e molas        
-         
-    spring = Spring()
+#desenho de pesos e molas     
+
     spring.draw_spring(r1, quadrado, s1)
     spring.draw_spring(r12, s1, s2)
     
-    strokeWeight(e) #Espessura normal
-    stroke(255)
-    fill(128,128,0)
-    ellipse(s1.x,s1.y,tamc,tamc)
-    fill(0,128,128)
-    ellipse(s2.x,s2.y,tamc,tamc)
-    
+    masses.draw_masses(e)    
         
     #desenho do quadrado
     fill(200,0,0)
@@ -226,10 +162,10 @@ def draw():
     global res_wall_1_ant,res_wall_2_ant 
     if res_wall_1[0] and not res_wall_1_ant:
         colisao = Collision(m1,v1)
-        v = colisao.walls(res_wall_1)        
+        masses.v1 = colisao.walls(res_wall_1)        
     if res_wall_2[0] and not res_wall_2_ant:
         colisao = Collision(m2,v2)
-        v2 = colisao.walls(res_wall_2)            
+        masses.v2 = colisao.walls(res_wall_2)            
     res_wall_1_ant = res_wall_1[0]
     res_wall_2_ant = res_wall_2[0]
     
@@ -239,8 +175,8 @@ def draw():
     if res_both[0] and not res_both_ant:
         colisao = Collision(m1,v1)
         vels = colisao.circle(s1,s2,m2,v2,r)
-        v1 = vels[0]
-        v2 = vels[1]      
+        masses.v1 = vels[0]
+        masses.v2 = vels[1]      
     res_both_ant = res_both[0]
     
     #quadrado
@@ -249,10 +185,10 @@ def draw():
     
     if res_1[0] and not res_1_ant:
         colisao = Collision(m1,v1)
-        v1 = colisao.square(res_1,s1,quadrado,tamq)
+        masses.v1 = colisao.square(res_1,s1,quadrado,tamq)
     if res_2[0] and not res_2_ant:
         colisao = Collision(m2,v2)
-        v2 = colisao.square(res_2,s2,quadrado,tamq)        
+        masses.v2 = colisao.square(res_2,s2,quadrado,tamq)        
     res_1_ant = res_1[0]
     res_2_ant = res_2[0]
     
@@ -294,17 +230,17 @@ def draw():
         resb_both_2_ant = resb_both_2[0]
         
 #vetores posição inicial
-def r1_inicial(g,m1,m2,k1,c1):
-    r1 = g.copy()
-    r1.mult((m1+m2)/k1)
-    r1.add(PVector(0,c1))
-    return r1
+# def r1_inicial(g,m1,m2,k1,c1):
+#     r1 = g.copy()
+#     r1.mult((m1+m2)/k1)
+#     r1.add(PVector(0,c1))
+#     return r1
     
-def r2_inicial(g,m2,k2,c2):
-    r2 = g.copy()
-    r2.mult(m2/k2+(m1+m2)/k1)
-    r2.add(PVector(0,c2+c1))
-    return r2
+# def r2_inicial(g,m2,k2,c2):
+#     r2 = g.copy()
+#     r2.mult(m2/k2+(m1+m2)/k1)
+#     r2.add(PVector(0,c2+c1))
+#     return r2
   
 def keyPressed():
     if key == 'a' or key == 'A':
@@ -313,8 +249,5 @@ def keyPressed():
     else:
         global entrada
         entrada = 'noMouse'
-        global v1,v2
-        v1 = PVector(0.0,0.0)
-        v2 = PVector(0.0,0.0)
         global r
         r = ran.uniform(0.5,1) #coeficiente de restituição
