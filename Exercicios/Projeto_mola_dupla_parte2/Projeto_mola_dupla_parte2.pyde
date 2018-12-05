@@ -15,18 +15,15 @@ g = PVector(0.0,98.0) #aceleracao da gravidade
 t = millis() #tempo inicial
 dt = millis()/1000.0
 
-largura = 800
-comprimento = 700
-p = 100.0 #tamanho de duas paredes paralelas
+
+largura,comprimento,p = 800,700,100.0 # tamanho de largura, comprimento e de duas paredes paralelas
+e = 1 # tamanho espessura mola
 
 #constantes em relação aos pesos e às molas
 
-k1 = 20.0 #constante da mola superior 
-k2 = 20.0 #contante da mola inferior
-c1 = 60.0 #comprimento da mola 1
-c2 = 60.0 #comprimento da mola 2
-m1 = 5.0 #massa do peso 1
-m2 = 5.0 #massa do peso 2
+k1,k2 = 20.0,20.0 #constantes das molas superior e inferior 
+c1,c2 = 60.0,60.0 #comprimento das molas
+m1,m2 = 5.0,5.0 #massa do pesos
 k = 0.1 #constante de retardo
 r = ran.uniform(0.6,1) #coeficiente de restituição
 
@@ -80,8 +77,7 @@ resb3_both_b2_ant = False
 def setup():
     global masses, spring
     size(largura,comprimento) 
-    frameRate(600)
-    
+    frameRate(60)
     spring = Spring()
     masses = Masses(g, m1, m2, k1, k2, c1, c2, r, quadrado, dt, tamc, k)
     
@@ -117,18 +113,7 @@ def draw():
 
     spring.draw_spring(r1, quadrado, s1)
     spring.draw_spring(r12, s1, s2)
-    
-<<<<<<< HEAD
-    strokeWeight(1) #Espessura normal
-    stroke(255)
-    fill(128,128,0)
-    ellipse(s1.x,s1.y,tamc,tamc)
-    fill(0,128,128)
-    ellipse(s2.x,s2.y,tamc,tamc)
-    
-=======
     masses.draw_masses(e)    
->>>>>>> c59cf6b9100694b34654ce0c8b61dc9d0d60e288
         
     #desenho do quadrado
     fill(200,0,0)
@@ -217,10 +202,10 @@ def draw():
 ################## Para brincar ####################
 
     if bola1:
-        global b1,resb1_wall_ant,resb1_quad_ant,resb1_both_1_ant, resb1_both_2_ant
-        if b1 == False:
-            b1 = Bolas(largura,comprimento,tamc,p,g,dt)
-        b1.draw_balls(k)
+        global b1, resb1_wall_ant,resb1_quad_ant,resb1_both_1_ant, resb1_both_2_ant
+        if not b1:
+            b1 = Bolas(largura,comprimento,tamc,p,g)
+        b1.draw_balls(k,dt)
         
         resb1_wall = cmp.col_walls(largura,comprimento,p,tamc,b1.posb)
         if resb1_wall[0] and not resb1_wall_ant:
@@ -239,7 +224,7 @@ def draw():
             colisao = Collision(b1.m,b1.vb)
             vels = colisao.circle(b1.posb,s1,m1,v1,r)
             b1.vb = vels[0]
-            v1 = vels[1]
+            masses.v1 = vels[1]
         resb1_both_1_ant = resb1_both_1[0]
         
         resb1_both_2 = cmp.col_circ(s2,b1.posb,tamc)
@@ -247,14 +232,14 @@ def draw():
             colisao = Collision(b1.m,b1.vb)
             vels = colisao.circle(b1.posb,s2,m2,v2,r)
             b1.vb = vels[0]
-            v2 = vels[1]
+            masses.v2 = vels[1]
         resb1_both_2_ant = resb1_both_2[0]
 
     if bola2:
         global b2,resb2_wall_ant,resb2_quad_ant,resb2_both_1_ant, resb2_both_2_ant,resb2_both_b1_ant
-        if b2 == False:
-            b2 = Bolas(largura,comprimento,tamc,p,g,dt)
-        b2.draw_balls(k)
+        if not b2:
+            b2 = Bolas(largura,comprimento,tamc,p,g)
+        b2.draw_balls(k,dt)
 
         resb2_wall = cmp.col_walls(largura,comprimento,p,tamc,b2.posb)
         if resb2_wall[0] and not resb2_wall_ant:
@@ -273,7 +258,7 @@ def draw():
             colisao = Collision(b2.m,b2.vb)
             vels = colisao.circle(b2.posb,s1,m1,v1,r)
             b2.vb = vels[0]
-            v1 = vels[1]
+            masses.v1 = vels[1]
         resb2_both_1_ant = resb2_both_1[0]
         
         resb2_both_2 = cmp.col_circ(s2,b2.posb,tamc)
@@ -281,7 +266,7 @@ def draw():
             colisao = Collision(b2.m,b2.vb)
             vels = colisao.circle(b2.posb,s2,m2,v2,r)
             b2.vb = vels[0]
-            v2 = vels[1]
+            masses.v2 = vels[1]
         resb2_both_2_ant = resb2_both_2[0]
 
         resb2_both_b1 = cmp.col_circ(b1.posb,b2.posb,tamc)
@@ -294,9 +279,9 @@ def draw():
 
     if bola3:
         global b3,resb3_wall_ant,resb3_quad_ant,resb3_both_1_ant, resb3_both_2_ant,resb3_both_b1_ant, resb3_both_b2_ant
-        if b3 == False:
-            b3 = Bolas(largura,comprimento,tamc,p,g,dt)
-        b3.draw_balls(k)
+        if not b3:
+            b3 = Bolas(largura,comprimento,tamc,p,g)
+        b3.draw_balls(k,dt)
         
         resb3_wall = cmp.col_walls(largura,comprimento,p,tamc,b3.posb)
         if resb3_wall[0] and not resb3_wall_ant:
@@ -315,7 +300,7 @@ def draw():
             colisao = Collision(b3.m,b3.vb)
             vels = colisao.circle(b3.posb,s1,m1,v1,r)
             b3.vb = vels[0]
-            v1 = vels[1]
+            masses.v1 = vels[1]
         resb3_both_1_ant = resb3_both_1[0]
         
         resb3_both_2 = cmp.col_circ(s2,b3.posb,tamc)
@@ -323,7 +308,7 @@ def draw():
             colisao = Collision(b3.m,b3.vb)
             vels = colisao.circle(b3.posb,s2,m2,v2,r)
             b3.vb = vels[0]
-            v2 = vels[1]
+            masses.v2 = vels[1]
         resb3_both_2_ant = resb3_both_2[0]
         
         resb3_both_b1 = cmp.col_circ(b1.posb,b3.posb,tamc)
@@ -344,19 +329,6 @@ def draw():
         
 ##########################################
         
-#vetores posição inicial
-# def r1_inicial(g,m1,m2,k1,c1):
-#     r1 = g.copy()
-#     r1.mult((m1+m2)/k1)
-#     r1.add(PVector(0,c1))
-#     return r1
-    
-# def r2_inicial(g,m2,k2,c2):
-#     r2 = g.copy()
-#     r2.mult(m2/k2+(m1+m2)/k1)
-#     r2.add(PVector(0,c2+c1))
-#     return r2
-  
 def keyPressed():
     if key == 'a' or key == 'A':
         global bola1
@@ -371,4 +343,5 @@ def keyPressed():
         global entrada
         entrada = 'noMouse'
         global r
-        r = ran.uniform(0.5,1) #coeficiente de restituição
+        r = ran.uniform(0.6,1) #coeficiente de restituição
+        bola1,bola2,bola3 = False,False,False
