@@ -14,7 +14,6 @@ g = PVector(0.0,98.0) #aceleracao da gravidade
 t = millis() #tempo inicial
 dt = millis()/1000.0
 
-e = 1.0 #esperssura da linha
 largura = 800
 comprimento = 700
 p = 100.0 #tamanho de duas paredes paralelas
@@ -177,7 +176,7 @@ def draw():
     spring.draw_spring(r1, quadrado, s1)
     spring.draw_spring(r12, s1, s2)
     
-    strokeWeight(e) #Espessura normal
+    strokeWeight(1) #Espessura normal
     stroke(255)
     fill(128,128,0)
     ellipse(s1.x,s1.y,tamc,tamc)
@@ -232,7 +231,7 @@ def draw():
     res_wall_2 = cmp.col_walls(largura,comprimento,p,tamc,s2)
     
     
-    ###Mas o que acontece se colidir? 
+    ### Mas o que acontece se colidir? 
     
     #Parede
     
@@ -275,33 +274,32 @@ def draw():
         global b1,resb1_wall_ant,resb1_quad_ant,resb1_both_1_ant, resb1_both_2_ant
         if b1 == False:
             b1 = Bolas(largura,comprimento,tamc,p,g,dt)
-        posb1 = b1.calculus_posicion(k)
-        fill(50,60,90)
-        ellipse(posb1.x,posb1.y,tamc,tamc)
-        resb1_wall = cmp.col_walls(largura,comprimento,p,tamc,posb1)
+        b1.draw_balls(k)
+        
+        resb1_wall = cmp.col_walls(largura,comprimento,p,tamc,b1.posb)
         if resb1_wall[0] and not resb1_wall_ant:
             colisao = Collision(b1.m,b1.vb)
             b1.vb = colisao.walls(resb1_wall)
         resb1_wall_ant = resb1_wall[0]
         
-        resb1_quad = cmp.col_quad(quadrado,tamq,tamc,posb1)
+        resb1_quad = cmp.col_quad(quadrado,tamq,tamc,b1.posb)
         if resb1_quad[0] and not resb1_quad_ant:
             colisao = Collision(b1.m,b1.vb)
-            b1.vb = colisao.square(resb1_quad,posb1,quadrado,tamq)
+            b1.vb = colisao.square(resb1_quad,b1.posb,quadrado,tamq)
         resb1_quad_ant = resb1_quad[0]
         
-        resb1_both_1 = cmp.col_circ(s1,posb1,tamc)
+        resb1_both_1 = cmp.col_circ(s1,b1.posb,tamc)
         if resb1_both_1[0] and not resb1_both_1_ant:
             colisao = Collision(b1.m,b1.vb)
-            vels = colisao.circle(posb1,s1,m1,v1,r)
+            vels = colisao.circle(b1.posb,s1,m1,v1,r)
             b1.vb = vels[0]
             v1 = vels[1]
         resb1_both_1_ant = resb1_both_1[0]
         
-        resb1_both_2 = cmp.col_circ(s2,posb1,tamc)
+        resb1_both_2 = cmp.col_circ(s2,b1.posb,tamc)
         if resb1_both_2[0] and not resb1_both_2_ant:
             colisao = Collision(b1.m,b1.vb)
-            vels = colisao.circle(posb1,s2,m2,v2,r)
+            vels = colisao.circle(b1.posb,s2,m2,v2,r)
             b1.vb = vels[0]
             v2 = vels[1]
         resb1_both_2_ant = resb1_both_2[0]
@@ -310,41 +308,40 @@ def draw():
         global b2,resb2_wall_ant,resb2_quad_ant,resb2_both_1_ant, resb2_both_2_ant,resb2_both_b1_ant
         if b2 == False:
             b2 = Bolas(largura,comprimento,tamc,p,g,dt)
-        posb2 = b2.calculus_posicion(k)
-        fill(50,60,90)
-        ellipse(posb2.x,posb2.y,tamc,tamc)
-        resb2_wall = cmp.col_walls(largura,comprimento,p,tamc,posb2)
+        b2.draw_balls(k)
+
+        resb2_wall = cmp.col_walls(largura,comprimento,p,tamc,b2.posb)
         if resb2_wall[0] and not resb2_wall_ant:
             colisao = Collision(b2.m,b2.vb)
             b2.vb = colisao.walls(resb2_wall)
         resb2_wall_ant = resb2_wall[0]
         
-        resb2_quad = cmp.col_quad(quadrado,tamq,tamc,posb2)
+        resb2_quad = cmp.col_quad(quadrado,tamq,tamc,b2.posb)
         if resb2_quad[0] and not resb2_quad_ant:
             colisao = Collision(b2.m,b2.vb)
-            b2.vb = colisao.square(resb2_quad,posb2,quadrado,tamq)
+            b2.vb = colisao.square(resb2_quad,b2.posb,quadrado,tamq)
         resb2_quad_ant = resb2_quad[0]
         
-        resb2_both_1 = cmp.col_circ(s1,posb2,tamc)
+        resb2_both_1 = cmp.col_circ(s1,b2.posb,tamc)
         if resb2_both_1[0] and not resb2_both_1_ant:
             colisao = Collision(b2.m,b2.vb)
-            vels = colisao.circle(posb2,s1,m1,v1,r)
+            vels = colisao.circle(b2.posb,s1,m1,v1,r)
             b2.vb = vels[0]
             v1 = vels[1]
         resb2_both_1_ant = resb2_both_1[0]
         
-        resb2_both_2 = cmp.col_circ(s2,posb2,tamc)
+        resb2_both_2 = cmp.col_circ(s2,b2.posb,tamc)
         if resb2_both_2[0] and not resb2_both_2_ant:
             colisao = Collision(b2.m,b2.vb)
-            vels = colisao.circle(posb2,s2,m2,v2,r)
+            vels = colisao.circle(b2.posb,s2,m2,v2,r)
             b2.vb = vels[0]
             v2 = vels[1]
         resb2_both_2_ant = resb2_both_2[0]
 
-        resb2_both_b1 = cmp.col_circ(posb1,posb2,tamc)
+        resb2_both_b1 = cmp.col_circ(b1.posb,b2.posb,tamc)
         if resb2_both_b1[0] and not resb2_both_b1_ant:
             colisao = Collision(b2.m,b2.vb)
-            vels = colisao.circle(posb2,posb1,b1.m,b1.vb,r)
+            vels = colisao.circle(b2.posb,b1.posb,b1.m,b1.vb,r)
             b2.vb = vels[0]
             b1.vb = vels[1]
         resb2_both_b1_ant = resb2_both_b1[0]
@@ -353,52 +350,53 @@ def draw():
         global b3,resb3_wall_ant,resb3_quad_ant,resb3_both_1_ant, resb3_both_2_ant,resb3_both_b1_ant, resb3_both_b2_ant
         if b3 == False:
             b3 = Bolas(largura,comprimento,tamc,p,g,dt)
-        posb3 = b3.calculus_posicion(k)
-        fill(50,60,90)
-        ellipse(posb3.x,posb3.y,tamc,tamc)
-        resb3_wall = cmp.col_walls(largura,comprimento,p,tamc,posb3)
+        b3.draw_balls(k)
+        
+        resb3_wall = cmp.col_walls(largura,comprimento,p,tamc,b3.posb)
         if resb3_wall[0] and not resb3_wall_ant:
             colisao = Collision(b3.m,b3.vb)
             b3.vb = colisao.walls(resb3_wall)
         resb3_wall_ant = resb3_wall[0]
         
-        resb3_quad = cmp.col_quad(quadrado,tamq,tamc,posb3)
+        resb3_quad = cmp.col_quad(quadrado,tamq,tamc,b3.posb)
         if resb3_quad[0] and not resb3_quad_ant:
             colisao = Collision(b3.m,b3.vb)
-            b3.vb = colisao.square(resb3_quad,posb3,quadrado,tamq)
+            b3.vb = colisao.square(resb3_quad,b3.posb,quadrado,tamq)
         resb3_quad_ant = resb3_quad[0]
         
-        resb3_both_1 = cmp.col_circ(s1,posb3,tamc)
+        resb3_both_1 = cmp.col_circ(s1,b3.posb,tamc)
         if resb3_both_1[0] and not resb3_both_1_ant:
             colisao = Collision(b3.m,b3.vb)
-            vels = colisao.circle(posb3,s1,m1,v1,r)
+            vels = colisao.circle(b3.posb,s1,m1,v1,r)
             b3.vb = vels[0]
             v1 = vels[1]
         resb3_both_1_ant = resb3_both_1[0]
         
-        resb3_both_2 = cmp.col_circ(s2,posb3,tamc)
+        resb3_both_2 = cmp.col_circ(s2,b3.posb,tamc)
         if resb3_both_2[0] and not resb3_both_2_ant:
             colisao = Collision(b3.m,b3.vb)
-            vels = colisao.circle(posb3,s2,m2,v2,r)
+            vels = colisao.circle(b3.posb,s2,m2,v2,r)
             b3.vb = vels[0]
             v2 = vels[1]
         resb3_both_2_ant = resb3_both_2[0]
         
-        resb3_both_b1 = cmp.col_circ(posb1,posb3,tamc)
+        resb3_both_b1 = cmp.col_circ(b1.posb,b3.posb,tamc)
         if resb3_both_b1[0] and not resb3_both_b1_ant:
             colisao = Collision(b3.m,b3.vb)
-            vels = colisao.circle(posb3,posb1,b1.m,b1.vb,r)
+            vels = colisao.circle(b3.posb,b1.posb,b1.m,b1.vb,r)
             b3.vb = vels[0]
             b1.vb = vels[1]
         resb3_both_b1_ant = resb3_both_b1[0]
         
-        resb3_both_b2 = cmp.col_circ(posb2,posb3,tamc)
+        resb3_both_b2 = cmp.col_circ(b2.posb,b3.posb,tamc)
         if resb3_both_b2[0] and not resb3_both_b2_ant:
             colisao = Collision(b3.m,b3.vb)
-            vels = colisao.circle(posb3,posb2,b2.m,b2.vb,r)
+            vels = colisao.circle(b3.posb,b2.posb,b2.m,b2.vb,r)
             b3.vb = vels[0]
             b2.vb = vels[1]
-        resb3_both_b2_ant = resb3_both_b2[0]       
+        resb3_both_b2_ant = resb3_both_b2[0]
+        
+##########################################
         
 #vetores posição inicial
 def r1_inicial(g,m1,m2,k1,c1):
