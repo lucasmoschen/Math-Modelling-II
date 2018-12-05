@@ -21,7 +21,7 @@ class Bolas:
     def energy(self,p):
         self.epg = self.m*self.g.mag()*(700-self.posb.y-p/2)
         self.ec = 1.0/2.0*self.m*(self.vb.mag())**2
-        
+        return self.epg, self.ec
     
     def calculus_aceleration(self,k):
         Frb = (-k)*self.vb #calcula força de retardo
